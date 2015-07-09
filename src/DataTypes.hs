@@ -8,13 +8,10 @@ import           Control.Lens
 import           Database.PostgreSQL.Simple.FromRow
 import           Database.PostgreSQL.Simple.ToRow
 import           Database.PostgreSQL.Simple.ToField
-import Control.Lens
-import Control.Monad.State.Class
-import Data.Aeson
-import Snap.Snaplet
-import Snap.Snaplet.PostgresqlSimple
+import           Control.Monad.State.Class
 import           Snap.Snaplet
 import           Data.Aeson as A
+import qualified Data.Text as T
 import           Snap.Snaplet.Heist
 import           Snap.Snaplet.PostgresqlSimple
 
@@ -29,7 +26,7 @@ instance ToRow Report where
   toRow d = [toField (name d), toField (description d), toField (effort d)]
 
 instance ToJSON Report where
-  toJSON (Report name description amount) = object [ "name" A..= name, "description" A..= description ]
+  toJSON (Report name description effort) = object [ "name" A..= name, "description" A..= description, "effort" A..= effort ]
 
 data Api = Api { _pg :: Snaplet Postgres }
 
