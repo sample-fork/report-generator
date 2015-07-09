@@ -9,24 +9,17 @@ import           DataTypes
 import           Snap.Core
 import           Snap.Snaplet
 import           Snap.Snaplet.Heist
-import           Heist
 import           Snap.Util.FileServe
+import           Api
 
 
 routes :: [(ByteString, Handler App App ())]
-routes = [ 
-			--("echo/:echoParam",   echoHandler)
-			("",                 serveDirectory "static")
+routes = [ ("",                 serveDirectory "static")
          ]
 
 app :: SnapletInit App App
 app = makeSnaplet "app" "Report Generator." Nothing $ do
     h <- nestSnaplet "" heist $ heistInit "templates"
+    a <- nestSnaplet "api" api apiInit
     addRoutes routes
-    return $ App h
-
---echoHandler :: Handler App ()
---echoHandler = do
---    param <- getParam "echoparam"
---    maybe (writeBS "must specify echo/param in URL")
---          writeBS param
+    return $ App h a
