@@ -2,7 +2,6 @@
 
 module Api where
 
-import           Snap.Snaplet
 import           Snap.Snaplet.PostgresqlSimple
 import           Snap.Core
 import           Data.Aeson
@@ -12,15 +11,33 @@ import qualified Data.ByteString.Char8 as B
 
 
 apiRoutes :: [(B.ByteString, Handler b Api ())]
-apiRoutes = [("echo/:echoparam",  method GET respondOk)
-             ,("reports",  method GET returnReports)
+apiRoutes = [ ("echo/:echoparam",  method GET respondOk)
+             ,("reports",  method GET getReports)
+             ,("reports/:reportId", method GET getReport)
             ]
 
-returnReports :: Handler b Api ()
-returnReports = do
-  reports <- query_ "SELECT name, description,effort FROM \"Reports\""
+getReports :: Handler b Api ()
+getReports = do
+  reports <- query_ "SELECT id, name, description,effort FROM \"Reports\""
   modifyResponse $ setHeader "Content-Type" "application/json"
   writeLBS . encode $ (reports :: [Report])
+
+notFound :: Handler b Api ()
+notFound = do
+  modifyResponse . setResponseCode $ 404
+  writeLBS "Not Found"
+
+getReport :: Handler b Api ()
+getReport = do
+  reportIdParam <- getParam "reportId"
+  report <- query "Select id, name, description, effort FROM \"Reports\" where id = ?" (Only reportIdParam)
+  modifyResponse $ setHeader "Content-Type" "application/json"
+  if length (report:: [Report]) == 0
+    then notFound
+    else writeLBS . encode $ head (report :: [Report])
+
+
+  
 
 respondOk :: Handler b Api ()
 respondOk = do

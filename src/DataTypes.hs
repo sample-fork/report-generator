@@ -11,22 +11,22 @@ import           Database.PostgreSQL.Simple.ToField
 import           Control.Monad.State.Class
 import           Snap.Snaplet
 import           Data.Aeson as A
-import qualified Data.Text as T
 import           Snap.Snaplet.Heist
 import           Snap.Snaplet.PostgresqlSimple
 
-data Report = Report { name :: String
+data Report = Report { reportId :: Int
+                     , name :: String
                      , description :: String
                      , effort :: Int} deriving (Show)
 
 instance FromRow Report where
-  fromRow = Report <$> field <*> field <*> field
+  fromRow = Report <$> field <*> field <*> field <*> field
 
 instance ToRow Report where
-  toRow d = [toField (name d), toField (description d), toField (effort d)]
+  toRow d = [toField (reportId d), toField (name d), toField (description d), toField (effort d)]
 
 instance ToJSON Report where
-  toJSON (Report name description effort) = object [ "name" A..= name, "description" A..= description, "effort" A..= effort ]
+  toJSON (Report reportId name description effort) = object [ "id" A..= reportId, "name" A..= name, "description" A..= description, "effort" A..= effort ]
 
 data Api = Api { _pg :: Snaplet Postgres }
 

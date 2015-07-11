@@ -6,7 +6,6 @@ module App
 
 import           Data.ByteString (ByteString)
 import           DataTypes
-import           Snap.Core
 import           Snap.Snaplet
 import           Snap.Snaplet.Heist
 import           Snap.Util.FileServe
