@@ -13,7 +13,7 @@ import           Api
 
 
 routes :: [(ByteString, Handler App App ())]
-routes = [ ("",                 serveDirectory "static")
+routes = [ ("static",                 serveDirectory "static")
          ]
 
 app :: SnapletInit App App

@@ -30,11 +30,11 @@ notFound = do
 getReport :: Handler b Api ()
 getReport = do
   reportIdParam <- getParam "reportId"
-  report <- query "Select id, name, description, effort FROM \"Reports\" where id = ?" (Only reportIdParam)
+  reports <- query "Select id, name, description, effort FROM \"Reports\" where id = ?" (Only reportIdParam)
   modifyResponse $ setHeader "Content-Type" "application/json"
-  if length (report:: [Report]) == 0
+  if length reports == 0
     then notFound
-    else writeLBS . encode $ head (report :: [Report])
+    else writeLBS . encode $ head (reports :: [Report])
 
 
   
