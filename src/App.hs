@@ -9,7 +9,7 @@ import           DataTypes
 import           Snap.Snaplet
 import           Snap.Snaplet.Heist
 import           Snap.Util.FileServe
-import           Api
+import           Api.Core
 
 
 routes :: [(ByteString, Handler App App ())]
