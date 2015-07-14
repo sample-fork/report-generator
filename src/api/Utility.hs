@@ -4,7 +4,7 @@ module Api.Utility where
 
 import           Snap.Snaplet.PostgresqlSimple
 import           Snap.Core
-import           Data.Aeson
+import qualified Data.Aeson as A
 import           Snap.Snaplet
 import           DataTypes
 import qualified Data.ByteString.Lazy.Char8 as L
@@ -19,3 +19,8 @@ badRequest :: Handler b Api()
 badRequest = do
   modifyResponse . setResponseCode $ 400
   writeLBS "Bad Request"
+
+writeJSON :: A.ToJSON v => v -> Handler a b ()
+writeJSON v = do
+   modifyResponse $ setContentType "application/json"
+   writeLBS $ A.encode v
