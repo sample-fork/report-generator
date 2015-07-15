@@ -33,8 +33,8 @@ instance FromJSON Report where
 
 
 
-data Student = Student { firstName :: String
-                       , lastName :: String
+data Student = Student { firstName :: Text
+                       , lastName :: Text
                        , studentEffort :: Int } deriving (Show)
 
 

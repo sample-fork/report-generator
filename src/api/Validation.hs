@@ -29,3 +29,9 @@ reportForm = Report
   <*> "description" .: optionalText Nothing
   <*> "effort" .: parseInteger
 
+
+studentForm :: Monad m => Form T.Text m Student
+studentForm = Student 
+  <$> "firstName" .: check "First name is required" isNotEmpty (text Nothing)
+  <*> "lastName" .: check "Last name is required" isNotEmpty (text Nothing)
+  <*> "effort" .: parseInteger
