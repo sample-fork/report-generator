@@ -9,28 +9,44 @@ import           Snap.Snaplet
 import           DataTypes
 import           Api.Utility
 import           Api.DataTypes
+import           Api.Validation
+import           Text.Digestive.Aeson (digestJSON, jsonErrors)
+import           Text.Digestive.View (View)
+import           Data.Text.Internal (Text)
+import qualified Data.ByteString.Lazy.Char8 as L
+import           Data.ByteString.Char8(pack)
 
 getReports :: Handler b Api ()
 getReports = do
   reports <- query_ "SELECT id, name, description,effort FROM \"Reports\""
-  modifyResponse $ setHeader "Content-Type" "application/json"
-  writeLBS . encode $ (reports :: [Report])
+  writeJSON $ (reports :: [Report])
 
 getReport :: Handler b Api ()
 getReport = do
   reportIdParam <- getParam "reportId"
   reports <- query "Select id, name, description, effort FROM \"Reports\" where id = ?" (Only reportIdParam)
-  modifyResponse $ setHeader "Content-Type" "application/json"
   if length reports == 0
     then notFound
-    else writeLBS . encode $ head (reports :: [Report])
+    else writeJSON . head $ (reports :: [Report])
+
+parseReport :: L.ByteString ->  Maybe (View Text, Maybe Report)
+parseReport r =  
+  case (decode r) of
+    Just jsonRep ->
+      fmap (\x ->  (fst x, snd x)) (digestJSON reportForm jsonRep)
+    Nothing -> Nothing
+
 
 createReport :: Handler b Api ()
 createReport = do
-  report <- readRequestBody 65536
-  modifyResponse $ setHeader "Content-Type" "application/json"
-  case (decode report :: Maybe Report) of
-    Just x -> do
-      execute "INSERT INTO \"Reports\" (name) VALUES (?)" [name x]
-      writeLBS . encode $ x
-    Nothing -> badRequest
+  reportBody <- readRequestBody 65536
+  case (parseReport reportBody) of
+    Just (view ,mReport) -> do
+      case mReport of
+        Just report -> do
+          execute "INSERT INTO \"Reports\" (name, effort, description) VALUES (?,?,?)" (name report, effort report, description report)
+          writeJSON report
+        Nothing -> do 
+          logError . pack .show . jsonErrors $ view
+          badRequest . pack .show . jsonErrors $ view
+    Nothing -> badRequest "unable to parse json"

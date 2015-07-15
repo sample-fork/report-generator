@@ -6,11 +6,12 @@ import           Database.PostgreSQL.Simple.FromRow
 import           Database.PostgreSQL.Simple.ToRow
 import           Database.PostgreSQL.Simple.ToField
 import           Data.Aeson
+import           Data.Text (Text)
 import           Control.Monad
 
 data Report = Report { reportId :: Int
-                     , name :: String
-                     , description :: Maybe String
+                     , name :: Text
+                     , description :: Maybe Text
                      , effort :: Int} deriving (Show)
 
 instance FromRow Report where
