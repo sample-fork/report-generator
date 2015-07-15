@@ -11,7 +11,9 @@ import           Api.Utility
 import           Api.DataTypes
 import           Api.Validation
 import           Text.Digestive.Aeson (digestJSON, jsonErrors)
-import           Data.Attoparsec.Lazy (parse, maybeResult)
+import           Text.Digestive.View (View)
+import           Data.Text.Internal (Text)
+import qualified Data.ByteString.Lazy.Char8 as L
 import           Data.ByteString.Char8(pack)
 
 getReports :: Handler b Api ()
@@ -27,6 +29,7 @@ getReport = do
     then notFound
     else writeJSON . head $ (reports :: [Report])
 
+parseReport :: L.ByteString ->  Maybe (View Text, Maybe Report)
 parseReport r =  
   case (decode r) of
     Just jsonRep ->
@@ -36,15 +39,14 @@ parseReport r =
 
 createReport :: Handler b Api ()
 createReport = do
-  report <- readRequestBody 65536
-  case (parseReport report) of
-    Just (v,x) -> do
-      case x of
-        Just y -> do
-      --err <-getErrors 
-          execute "INSERT INTO \"Reports\" (name) VALUES (?)" [name y]
-          writeJSON x
+  reportBody <- readRequestBody 65536
+  case (parseReport reportBody) of
+    Just (view ,mReport) -> do
+      case mReport of
+        Just report -> do
+          execute "INSERT INTO \"Reports\" (name, effort, description) VALUES (?,?,?)" (name report, effort report, description report)
+          writeJSON report
         Nothing -> do 
-          logError . pack .show . jsonErrors $ v
-          badRequest
-    Nothing -> badRequest
+          logError . pack .show . jsonErrors $ view
+          badRequest "JSON validation error"
+    Nothing -> badRequest "unable to parse json"
