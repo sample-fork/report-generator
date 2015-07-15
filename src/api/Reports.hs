@@ -48,5 +48,5 @@ createReport = do
           writeJSON report
         Nothing -> do 
           logError . pack .show . jsonErrors $ view
-          badRequest "JSON validation error"
+          badRequest . pack .show . jsonErrors $ view
     Nothing -> badRequest "unable to parse json"
