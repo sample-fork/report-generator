@@ -15,7 +15,7 @@ import           Text.Digestive.View (View)
 import           Data.Text.Internal (Text)
 import qualified Data.ByteString.Lazy.Char8 as L
 import           Data.ByteString.Char8(pack)
-
+import           Data.Aeson (encode)
 getReports :: Handler b Api ()
 getReports = do
   reports <- query_ "SELECT id, name, description,effort FROM \"Reports\""
@@ -48,5 +48,5 @@ createReport = do
           writeJSON report
         Nothing -> do 
           logError . pack .show . jsonErrors $ view
-          badRequest . pack .show . jsonErrors $ view
+          badRequest . encode . jsonErrors $ view
     Nothing -> badRequest "unable to parse json"
