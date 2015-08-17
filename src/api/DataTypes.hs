@@ -9,10 +9,16 @@ import           Data.Aeson
 import           Data.Text (Text)
 import           Control.Monad
 
+
+type ReportName = Text
+
+type ReportDescription = Text
+
 data Report = Report { reportId :: Int
-                     , name :: Text
-                     , description :: Maybe Text
+                     , name :: ReportName
+                     , description :: Maybe ReportDescription
                      , effort :: Int} deriving (Show)
+
 
 instance FromRow Report where
   fromRow = Report <$> field <*> field <*> field <*> field

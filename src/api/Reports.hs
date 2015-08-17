@@ -4,7 +4,6 @@ module Api.Reports where
 
 import           Snap.Snaplet.PostgresqlSimple
 import           Snap.Core
-import           Data.Aeson
 import           Snap.Snaplet
 import           DataTypes
 import           Api.Utility
@@ -15,7 +14,7 @@ import           Text.Digestive.View (View)
 import           Data.Text.Internal (Text)
 import qualified Data.ByteString.Lazy.Char8 as L
 import           Data.ByteString.Char8(pack)
-import           Data.Aeson (encode)
+import           Data.Aeson (encode, decode)
 getReports :: Handler b Api ()
 getReports = do
   reports <- query_ "SELECT id, name, description,effort FROM \"Reports\""
@@ -33,7 +32,7 @@ parseReport :: L.ByteString ->  Maybe (View Text, Maybe Report)
 parseReport r =  
   case (decode r) of
     Just jsonRep ->
-      fmap (\x ->  (fst x, snd x)) (digestJSON reportForm jsonRep)
+      digestJSON reportForm jsonRep
     Nothing -> Nothing
 
 
